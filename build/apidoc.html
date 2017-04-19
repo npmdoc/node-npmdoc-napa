@@ -61,12 +61,405 @@
 
     <li class="apidocModuleLi"><a href="#apidoc.module.napa">module napa</a><ol>
 
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.napa.napa">
+            function <span class="apidocSignatureSpan"></span>napa
+            <span class="apidocSignatureSpan">(url, name, opts)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">napa.</span>cli</span>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.napa.cli">module napa.cli</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.napa.cli.cli">
+            function <span class="apidocSignatureSpan">napa.</span>cli
+            <span class="apidocSignatureSpan">(args, done)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.napa.cli._loadFromPkg">
+            function <span class="apidocSignatureSpan">napa.cli.</span>_loadFromPkg
+            <span class="apidocSignatureSpan">(property, defaults)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.napa.cli.args">
+            function <span class="apidocSignatureSpan">napa.cli.</span>args
+            <span class="apidocSignatureSpan">(str)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.napa.cli.getref">
+            function <span class="apidocSignatureSpan">napa.cli.</span>getref
+            <span class="apidocSignatureSpan">(url)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.napa.cli.readpkg">
+            function <span class="apidocSignatureSpan">napa.cli.</span>readpkg
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.napa.cli.url">
+            function <span class="apidocSignatureSpan">napa.cli.</span>url
+            <span class="apidocSignatureSpan">(url)</span>
+            </a>
+
+        </li>
+
     </ol></li>
 
 </ol></div>
 
 <div class="apidocSectionDiv">
 <h1><a href="#apidoc.module.napa" id="apidoc.module.napa">module napa</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.napa.napa" id="apidoc.element.napa.napa">
+        function <span class="apidocSignatureSpan"></span>napa
+        <span class="apidocSignatureSpan">(url, name, opts)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function NapaPkg(url, name, opts) {
+  if (!(this instanceof NapaPkg)) return new NapaPkg(url, name, opts)
+  var self = this
+  opts = opts || {}
+  this.cwd = opts.cwd || process.cwd()
+  this.log = opts.log || log
+  if (opts[&#x27;log-level&#x27;]) this.log.level = opts[&#x27;log-level&#x27;]
+  this._mock = opts._mock
+  this.ref = opts.ref
+  this.url = url
+  this.name = name
+  this.installTo = path.join(this.cwd, &#x27;node_modules&#x27;, this.name)
+  this.useCache = (typeof opts.cache === &#x27;undefined&#x27;) || opts.cache !== false
+  this.cacheTo = cache(
+    typeof opts[&#x27;cache-path&#x27;] !== &#x27;string&#x27;
+      ? tmp
+      : path.resolve(this.cwd, opts[&#x27;cache-path&#x27;]),
+    this.url
+  )
+  this._napaResolvedKey = &#x27;_napaResolved&#x27;
+  this.saveToPkgJson = opts.save
+
+  Object.defineProperty(self, &#x27;installed&#x27;, {
+    get: function () {
+      var existing = path.join(self.installTo, &#x27;package.json&#x27;)
+      return (fs.existsSync(existing) &#x26;&#x26; require(existing)[self._napaResolvedKey] === url)
+    }
+  })
+  Object.defineProperty(self, &#x27;cached&#x27;, {
+    get: function () { return fs.existsSync(self.cacheTo) }
+  })
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.napa.cli" id="apidoc.module.napa.cli">module napa.cli</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.napa.cli.cli" id="apidoc.element.napa.cli.cli">
+        function <span class="apidocSignatureSpan">napa.</span>cli
+        <span class="apidocSignatureSpan">(args, done)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">cli = function (args, done) {
+  var parsedArgs = minimist(args)
+  args = parsedArgs[&#x27;_&#x27;]
+  var total = 0
+  var pkg = napa.readpkg()
+  var opts = napa._loadFromPkg(&#x27;napa-config&#x27;, {})
+
+  // Add flags to opts
+  var flags = parsedArgs
+  delete flags[&#x27;_&#x27;]
+  opts = extend(opts, flags)
+
+  if (pkg) {
+    args = args.map(napa.args).concat(pkg)
+  } else {
+    args = args.map(napa.args)
+  }
+
+  args.forEach(function (cmd) {
+    total++
+    opts.ref = cmd[2]
+
+    var pkg = new Pkg(cmd[0], cmd[1], opts)
+    pkg.install(close)
+  })
+
+  function close () {
+    total--
+    if (total &#x3c; 1 &#x26;&#x26; typeof done === &#x27;function&#x27;) {
+      return done()
+    }
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.napa.cli._loadFromPkg" id="apidoc.element.napa.cli._loadFromPkg">
+        function <span class="apidocSignatureSpan">napa.cli.</span>_loadFromPkg
+        <span class="apidocSignatureSpan">(property, defaults)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">_loadFromPkg = function (property, defaults) {
+  if (typeof defaults === &#x27;undefined&#x27;) {
+    defaults = false
+  }
+
+  var pkgPath = path.join(cwd, &#x27;package.json&#x27;)
+
+  if (!fs.existsSync(pkgPath)) {
+    return defaults
+  }
+
+  var pkg = require(pkgPath)
+
+  return pkg.hasOwnProperty(property) ? pkg[property] : defaults
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+  [&#x27;git://github.com/components/handlebars.js&#x27;, &#x27;handlebars&#x27;, &#x27;&#x27;]
+]
+t.deepEqual(actual, expected)
+})
+
+test(&#x27;readconfig&#x27;, function (t) {
+t.plan(1)
+var actual = napa.<span class="apidocCodeKeywordSpan">_loadFromPkg</span>(&#x27;napa-config&#x27;, {})
+t.deepEqual(actual, {&#x27;cache&#x27;: false})
+})
+
+test(&#x27;no-caching&#x27;, function (t) {
+t.plan(1)
+var url = &#x27;https://github.com/emberjs/ember.js/archive/v1.7.0.tar.gz&#x27;
+var pkgName = &#x27;ember&#x27;
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.napa.cli.args" id="apidoc.element.napa.cli.args">
+        function <span class="apidocSignatureSpan">napa.cli.</span>args
+        <span class="apidocSignatureSpan">(str)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">args = function (str) {
+  var url, name
+  var split = str.split(&#x27;:&#x27;)
+
+  if (split.length === 3) {
+    name = split[2]
+    url = split.slice(0, 2).join(&#x27;:&#x27;)
+  } else if (split.length === 2) {
+    if (split[1].slice(0, 2) === &#x27;//&#x27;) {
+      url = split.join(&#x27;:&#x27;)
+    } else {
+      url = split[0]
+      name = split[1]
+    }
+  } else {
+    url = split.join(&#x27;:&#x27;)
+  }
+
+  if (!name) {
+    name = url.slice(url.lastIndexOf(&#x27;/&#x27;) + 1)
+  }
+
+  return [napa.url(url), name, napa.getref(str)]
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+function cleanPkgJson (path, json, name) {
+  delete json.napa[name]
+  writeJsonFile.sync(path, json, { indent: 2 })
+}
+
+test(&#x27;args&#x27;, function (t) {
+  t.plan(5)
+  t.deepEqual(napa.<span class="apidocCodeKeywordSpan">args</span>(&#x27;user/repo&#x27;), [&#x27;git://github.com/user/repo&#x27
+;, &#x27;repo&#x27;, &#x27;&#x27;])
+  t.deepEqual(napa.args(&#x27;https://github.com/user/repo:testing&#x27;), [&#x27;https://github.com/user/repo&#x27;, &#x27;testing
+&#x27;, &#x27;&#x27;])
+  t.deepEqual(napa.args(&#x27;git://github.com/user/repo2&#x27;), [&#x27;git://github.com/user/repo2&#x27;, &#x27;repo2&#x27;, &#
+x27;&#x27;])
+  // when developing on windows, this returns zip, linux is tar.gz
+  t.deepEqual(napa.args(&#x27;angular/angular.js#v1.2.3:angular&#x27;), [&#x27;https://github.com/angular/angular.js/archive/v1.
+2.3.&#x27; + ((process.platform === &#x27;win32&#x27;) ? &#x27;zip&#x27; : &#x27;tar.gz&#x27;), &#x27;angular&#x27;, &#x27;v1.2.
+3:angular&#x27;])
+  t.deepEqual(napa.args(&#x27;https://github.com/angular/angular.js/archive/master.zip:angular&#x27;), [&#x27;https://github.com
+/angular/angular.js/archive/master.zip&#x27;, &#x27;angular&#x27;, &#x27;&#x27;])
+})
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.napa.cli.getref" id="apidoc.element.napa.cli.getref">
+        function <span class="apidocSignatureSpan">napa.cli.</span>getref
+        <span class="apidocSignatureSpan">(url)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">getref = function (url) {
+  return url.replace(/^[^#]*#?/, &#x27;&#x27;)
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+  url = split.join(&#x27;:&#x27;)
+}
+
+if (!name) {
+  name = url.slice(url.lastIndexOf(&#x27;/&#x27;) + 1)
+}
+
+return [napa.url(url), name, napa.<span class="apidocCodeKeywordSpan">getref</span>(str)]
+}
+
+napa.url = function (url) {
+if (typeof url !== &#x27;string&#x27;) {
+  if (url.url) url = url.url
+  else return false
+}
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.napa.cli.readpkg" id="apidoc.element.napa.cli.readpkg">
+        function <span class="apidocSignatureSpan">napa.cli.</span>readpkg
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">readpkg = function () {
+  var repos = napa._loadFromPkg(&#x27;napa&#x27;) || {}
+
+  return Object.keys(repos).map(function (repo) {
+    var repoLocation = repos[repo]
+    return [napa.url(repoLocation), repo, napa.getref(repoLocation)]
+  })
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+  assertPkg(&#x27;https://github.com/yahoo/pure/releases/download/v0.5.0/pure-0.5.0.tar.gz&#x27;, &#x27;pure&#x27;, function (result
+) {
+    t.deepEqual(result, [&#x27;download&#x27;, &#x27;https://github.com/yahoo/pure/releases/download/v0.5.0/pure-0.5.0.tar.gz&#x27
+;, path.resolve(&#x27;node_modules&#x27;, &#x27;pure&#x27;)])
+  })
+})
+
+test(&#x27;readpkg&#x27;, function (t) {
+  t.plan(1)
+  var actual = napa.<span class="apidocCodeKeywordSpan">readpkg</span>()
+  var expected = [
+    [&#x27;git://github.com/foo/repo&#x27;, &#x27;foo&#x27;, &#x27;&#x27;],
+    [&#x27;https://github.com/emberjs/ember.js/archive/v1.7.0.tar.gz&#x27;, &#x27;ember&#x27;, &#x27;&#x27;],
+    [&#x27;git://github.com/components/handlebars.js&#x27;, &#x27;handlebars&#x27;, &#x27;&#x27;]
+  ]
+  t.deepEqual(actual, expected)
+})
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.napa.cli.url" id="apidoc.element.napa.cli.url">
+        function <span class="apidocSignatureSpan">napa.cli.</span>url
+        <span class="apidocSignatureSpan">(url)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">url = function (url) {
+  if (typeof url !== &#x27;string&#x27;) {
+    if (url.url) url = url.url
+    else return false
+  }
+
+  if (url.indexOf(&#x27;#&#x27;) !== -1) {
+    if (url.indexOf(&#x27;://&#x27;) === -1) {
+      var s = url.split(&#x27;#&#x27;)
+      url = &#x27;https://github.com/&#x27; + s[0] + &#x27;/archive/&#x27; + s[1]
+      if (process.platform === &#x27;win32&#x27;) url += &#x27;.zip&#x27;
+      else url += &#x27;.tar.gz&#x27;
+    } else {
+      url = url.replace(/#.*?$/, &#x27;&#x27;)
+    }
+  }
+
+  if (url.slice(0, 1) === &#x27;/&#x27;) {
+    url = url.slice(1)
+  }
+
+  if (url.indexOf(&#x27;://&#x27;) === -1) {
+    url = &#x27;git://github.com/&#x27; + url
+  }
+
+  return url
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+  url = split.join(&#x27;:&#x27;)
+}
+
+if (!name) {
+  name = url.slice(url.lastIndexOf(&#x27;/&#x27;) + 1)
+}
+
+return [napa.<span class="apidocCodeKeywordSpan">url</span>(url), name, napa.getref(str)]
+}
+
+napa.url = function (url) {
+if (typeof url !== &#x27;string&#x27;) {
+  if (url.url) url = url.url
+  else return false
+}
+...</pre></li>
+    </ul>
+
 
 </div>
 
