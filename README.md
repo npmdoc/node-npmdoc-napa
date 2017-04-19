@@ -1,9 +1,14 @@
-# api documentation for  [napa (v2.3.0)](https://github.com/shama/napa)  [![npm package](https://img.shields.io/npm/v/npmdoc-napa.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-napa) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-napa.svg)](https://travis-ci.org/npmdoc/node-npmdoc-napa)
+# npmdoc-napa
+
+#### api documentation for  [napa (v2.3.0)](https://github.com/shama/napa)  [![npm package](https://img.shields.io/npm/v/npmdoc-napa.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-napa) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-napa.svg)](https://travis-ci.org/npmdoc/node-npmdoc-napa)
+
 #### A helper for installing repos without a package.json with npm.
 
-[![NPM](https://nodei.co/npm/napa.png?downloads=true)](https://www.npmjs.com/package/napa)
+[![NPM](https://nodei.co/npm/napa.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/napa)
 
-[![apidoc](https://npmdoc.github.io/node-npmdoc-napa/build/screenCapture.buildNpmdoc.browser._2Fhome_2Ftravis_2Fbuild_2Fnpmdoc_2Fnode-npmdoc-napa_2Ftmp_2Fbuild_2Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-napa/build/apidoc.html)
+- [https://npmdoc.github.io/node-npmdoc-napa/build/apidoc.html](https://npmdoc.github.io/node-npmdoc-napa/build/apidoc.html)
+
+[![apidoc](https://npmdoc.github.io/node-npmdoc-napa/build/screenCapture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-napa/build/apidoc.html)
 
 ![npmPackageListing](https://npmdoc.github.io/node-npmdoc-napa/build/screenCapture.npmPackageListing.svg)
 
@@ -18,7 +23,6 @@
 {
     "author": {
         "name": "Kyle Robinson Young",
-        "email": "kyle@dontkry.com",
         "url": "http://dontkry.com"
     },
     "bin": {
@@ -66,16 +70,13 @@
     "main": "lib/pkg.js",
     "maintainers": [
         {
-            "name": "caseywebb",
-            "email": "notcaseywebb@gmail.com"
+            "name": "caseywebb"
         },
         {
-            "name": "shama",
-            "email": "kyle@dontkry.com"
+            "name": "shama"
         },
         {
-            "name": "tomekwi",
-            "email": "t.wiszniewski@gmail.com"
+            "name": "tomekwi"
         }
     ],
     "name": "napa",
@@ -91,7 +92,6 @@
     "pre-commit": [
         "format"
     ],
-    "readme": "ERROR: No README data found!",
     "repository": {
         "type": "git",
         "url": "git://github.com/shama/napa.git"
@@ -104,16 +104,6 @@
     "version": "2.3.0"
 }
 ```
-
-
-
-# <a name="apidoc.tableOfContents"></a>[table of contents](#apidoc.tableOfContents)
-
-#### [module napa](#apidoc.module.napa)
-
-
-
-# <a name="apidoc.module.napa"></a>[module napa](#apidoc.module.napa)
 
 
 
